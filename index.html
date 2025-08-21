@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz — Propiedades del Pensamiento Sistémico</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#0f172a; color:#e5e7eb; display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; }
+    .app { width:90%; max-width:850px; background:#111827; border-radius:20px; padding:25px; box-shadow:0 12px 32px rgba(0,0,0,.6); text-align:center; }
+    h1 { font-size:28px; margin-bottom:10px; }
+    h2 { margin:12px 0; }
+    p { color:#9ca3af; }
+    .question { font-size:20px; font-weight:bold; margin:15px 0; }
+    .option { margin:8px 0; padding:12px; background:#1f2937; border-radius:12px; cursor:pointer; transition:.2s; text-align:left; }
+    .option:hover { background:#374151; }
+    .correct { background:rgba(34,197,94,.2); border:1px solid #22c55e; }
+    .wrong { background:rgba(239,68,68,.2); border:1px solid #ef4444; }
+    .controls { display:flex; justify-content:space-between; margin-top:20px; }
+    button { padding:10px 18px; border:none; border-radius:10px; cursor:pointer; font-weight:bold; }
+    .primary { background:#22c55e; color:white; }
+    .secondary { background:#3b82f6; color:white; }
+    .hidden { display:none; }
+    .result { margin-top:20px; }
+    .emoji { font-size:22px; margin-right:8px; }
+    .question-img { max-width: 100%; border-radius: 12px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div id="intro">
+      <h1>🌐 Quiz: Propiedades del Pensamiento Sistémico</h1>
+      <p>Bienvenido 👋 Este quiz pondrá a prueba tus conocimientos sobre las propiedades de los sistemas. 📚<br>
+      Responde cada pregunta con calma, al final verás tu puntaje y sabrás qué tan bien dominas el tema. 🚀</p>
+      <button id="start" class="primary">Comenzar ➡️</button>
+    </div>
+
+    <div id="quiz" class="hidden"></div>
+
+    <div class="controls hidden" id="nav">
+      <button id="prev" class="secondary">⬅️ Anterior</button>
+      <button id="next" class="primary">Siguiente ➡️</button>
+    </div>
+
+    <div id="result" class="result hidden"></div>
+  </div>
+
+  <script>
+    const QUESTIONS = [
+      { text: "🤝 ¿Qué es la SINERGIA en un sistema?", options:["El desgaste con el tiempo","La acción conjunta de partes que generan un resultado mayor","La capacidad de mantener balance","El control desde un núcleo central"], correct:1, image:"https://upload.wikimedia.org/wikipedia/commons/f/fd/Teamwork_icon.svg" },
+      { text: "🔄 El constante cambio y crecimiento de un sistema define:", options:["Entropía","Dinámismo","Equifinalidad","Retroalimentación"], correct:1, image:"https://upload.wikimedia.org/wikipedia/commons/2/29/Recycle001.svg" },
+      { text: "⚡ La ENTROPÍA en un sistema se refiere a:", options:["Su capacidad de adaptación","El desgaste con el tiempo que puede llevar a su desaparición","El aprendizaje del sistema","El control del entorno"], correct:1, image:"" },
+      { text: "🛡️ La HOMEOSTASIS significa:", options:["El nivel de respuesta adaptativa para la supervivencia","El logro de objetivos comunes","La medición de interacción con el entorno","La capacidad de aprender"], correct:0, image:"" },
+      { text: "🎯 EQUIFINALIDAD quiere decir:", options:["Un sistema siempre se desgasta","Se pueden lograr objetivos por distintos caminos","Un núcleo controla todo","Las salidas se convierten en entradas"], correct:1, image:"" },
+      { text: "🔓 La PERMEABILIDAD mide:", options:["El balance interno","El grado de interacción con el entorno","La supervivencia de un sistema","La organización interna"], correct:1, image:"" },
+      { text: "📡 Un sistema es CENTRALIZADO cuando:", options:["Tiene un núcleo que da órdenes a las demás partes","Está compuesto por varios subsistemas independientes","Se adapta al entorno","Recibe retroalimentación"], correct:0, image:"" },
+      { text: "🧠 La ADAPTABILIDAD es:", options:["Capacidad de aprender y modificar procesos según el entorno","La capacidad de mantenerse estático","La medida de interacción","El proceso de retroalimentación"], correct:0, image:"" },
+      { text: "⚙️ La MANTENIBILIDAD de un sistema se refiere a:", options:["Su capacidad de mantenerse en funcionamiento balanceando subsistemas","Su capacidad de recibir entradas","El desgaste del tiempo","Su capacidad de sobrevivir"], correct:0, image:"" },
+      { text: "⚖️ La ESTABILIDAD significa:", options:["Mantener un balance con flujo constante de entradas","La capacidad de centralización","El desgaste del tiempo","Un proceso de aprendizaje"], correct:0, image:"" },
+      { text: "🎵 Un SISTEMA ARMÓNICO es aquel que:", options:["Se adapta al entorno pero puede estar estático según se requiera","Siempre está en cambio","Nunca cambia","Es totalmente cerrado"], correct:0, image:"" },
+      { text: "🚀 La OPTIMIZACIÓN ocurre cuando:", options:["El sistema sufre desgaste","Se realizan modificaciones para lograr objetivos","El sistema aprende del entorno","El núcleo controla todas las partes"], correct:1, image:"" },
+      { text: "✅ La VIABILIDAD indica:", options:["La capacidad de sobrevivencia y adaptación a un medio cambiante","La estabilidad frente al tiempo","La medición de interacción con el entorno","El aprendizaje continuo"], correct:0, image:"" },
+      { text: "🔁 La RETROALIMENTACIÓN consiste en:", options:["El sistema se desgasta","Las salidas se convierten en entradas para regular comportamientos","La adaptación al entorno","El control centralizado"], correct:1, image:"" },
+      { text: "❓ La INCERTIDUMBRE en un sistema significa:", options:["Que nunca cambia","No es posible conocer totalmente un sistema físico ni sus variables","Que mantiene estabilidad","Que siempre se optimiza"], correct:1, image:"" },
+      { text: "🏗️ La ORGANIZACIÓN en un sistema replantea:", options:["Problemas de totalidad, diferenciación y control","El desgaste por tiempo","La supervivencia en cambios","El flujo de entradas"], correct:0, image:"" },
+    ];
+
+    let current = 0, score = 0;
+    let shuffledOptions = [];
+
+    const introEl = document.getElementById('intro');
+    const quizEl = document.getElementById('quiz');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const resultEl = document.getElementById('result');
+    const navEl = document.getElementById('nav');
+    const startBtn = document.getElementById('start');
+
+    startBtn.addEventListener('click', ()=>{
+      introEl.classList.add('hidden');
+      quizEl.classList.remove('hidden');
+      navEl.classList.remove('hidden');
+      loadQuestion();
+    });
+
+    function shuffleArray(arr) {
+      return arr.map(v => ({v, sort: Math.random()}))
+                .sort((a, b) => a.sort - b.sort)
+                .map(({v}) => v);
+    }
+
+    function loadQuestion(){
+      const q = QUESTIONS[current];
+      shuffledOptions = shuffleArray(q.options.map((opt, i)=>({text: opt, isCorrect: i===q.correct})));
+
+      quizEl.innerHTML = `<h2 class='question'>${q.text}</h2>` +
+        (q.image ? `<img src="${q.image}" alt="Imagen de la pregunta" class="question-img">` : "") +
+        shuffledOptions.map((o,i)=>`<div class='option' onclick='selectAnswer(${i})'>${String.fromCharCode(65+i)}) ${o.text}</div>`).join('');
+
+      prevBtn.classList.toggle('hidden', current===0);
+      nextBtn.textContent = current===QUESTIONS.length-1 ? "Finalizar ✅" : "Siguiente ➡️";
+    }
+
+    window.selectAnswer = function(i){
+      const options = document.querySelectorAll('.option');
+      options.forEach((opt,idx)=>{
+        opt.classList.remove('correct','wrong');
+        if(shuffledOptions[idx].isCorrect) opt.classList.add('correct');
+        else if(idx===i) opt.classList.add('wrong');
+      });
+      if(shuffledOptions[i].isCorrect) score++;
+    }
+
+    nextBtn.addEventListener('click', ()=>{
+      if(current<QUESTIONS.length-1){
+        current++;
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    });
+
+    prevBtn.addEventListener('click', ()=>{
+      if(current>0){ current--; loadQuestion(); }
+    });
+
+    function showResult(){
+      quizEl.innerHTML = '';
+      navEl.classList.add('hidden');
+      resultEl.classList.remove('hidden');
+      const percent = Math.round((score/QUESTIONS.length)*100);
+      let emoji = "😅";
+      if(percent===100) emoji = "🏆🔥";
+      else if(percent>=80) emoji = "💪✨";
+      else if(percent>=60) emoji = "👍";
+      resultEl.innerHTML = `<h2>Resultado Final ${emoji}</h2><p>Tu puntaje: <strong>${score}/${QUESTIONS.length}</strong> (${percent}%)</p>`;
+    }
+  </script>
+</body>
+</html>
